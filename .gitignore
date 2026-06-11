@@ -693,3 +693,4 @@ crashlytics-build.properties
 # End of https://www.toptal.com/developers/gitignore/api/csharp,macos,unity,visualstudiocode,visualstudio
 
 /*/Library/*
+/*/*/Library/*
