@@ -14,13 +14,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] CinemachineImpulseSource impulseSource;
     [SerializeField] CinemachineCamera cinemachineCamera;
 
+    [SerializeField] GameObject arrow;
+    [SerializeField] Transform bow;
+
 
     [SerializeField] float runSpeed = 2f;
     [SerializeField] float jumpSpeed = 10f;
     [SerializeField] float climbingSpeed = 0.24f;
 
     [SerializeField] float swimSpeed = 1.5f;
-    [SerializeField] float swimGravityScale = 0.2f;
+    [SerializeField] float swimGravityScale = 2f;
     [SerializeField] float swimUpSpeed = 2f;
 
     [SerializeField] BoxCollider2D feetCollider;
@@ -104,6 +107,20 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void OnAttack(InputValue value)
+    {
+        if (!value.isPressed || !isAlive) return;
+
+        if (!isInWater)
+        {
+            Instantiate(
+                arrow,
+                bow.position,
+                bow.rotation
+                );
+        }
+    }
+
     void PerformJump()
     {
         if (isInWater) { return; }
@@ -163,11 +180,11 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        playerRigidBody2D.gravityScale = 0;
+        playerRigidBody2D.gravityScale = swimGravityScale;
 
         playerRigidBody2D.linearVelocity = new Vector2(
             moveInput.x * swimSpeed,
-            moveInput.y * swimUpSpeed + 0.5f - 0.1f
+            moveInput.y * swimUpSpeed
         );
     }
 
