@@ -202,14 +202,22 @@ public class PlayerMovement : MonoBehaviour
             isAlive = false;
             playerAnimator.SetTrigger("Dying");
 
-            StartCoroutine(DeathFlash());
+            var gameSession = FindAnyObjectByType<GameSession>();
+            if (gameSession.HasMoreLives)
+            {
+                FindAnyObjectByType<GameSession>().ProcessPlayerDeath();
+            }
+            else
+            {
+                StartCoroutine(DeathFlash());
 
-            impulseSource.GenerateImpulse();
-            StartCoroutine(DeathFreeze());
-            StartCoroutine(DeathZoom());
+                impulseSource.GenerateImpulse();
+                StartCoroutine(DeathFreeze());
+                StartCoroutine(DeathZoom());
 
-            playerRigidBody2D.linearVelocity = deathKick;
-            Invoke("DisablePlayer", 0.75f);
+                playerRigidBody2D.linearVelocity = deathKick;
+                Invoke("DisablePlayer", 0.75f);
+            }
         }
     }
 
