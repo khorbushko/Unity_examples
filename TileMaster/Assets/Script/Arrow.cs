@@ -6,6 +6,7 @@ public class Arrow : MonoBehaviour
     private Rigidbody2D rigidBody2D;
     [SerializeField] float speed = 1f;
     private float xSpeed = 1f;
+    public AudioClip arrowAudioClip;
 
     PlayerMovement player;
     void Start()
@@ -18,6 +19,8 @@ public class Arrow : MonoBehaviour
                player.transform.localScale.x,
                1f
            ); // rotate arrow
+           
+        FindAnyObjectByType<GeneralSoundController>().PlaySound(arrowAudioClip);
     }
 
     void Update()

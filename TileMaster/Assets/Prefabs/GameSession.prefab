@@ -44,3 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eab58702da3f04eb6992b775be4c8d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameSession
+  playerLives: 2
+  levelBackgroundAudioClip: {fileID: 0}
+  gameOverAudioClip: {fileID: 8300000, guid: f315f339732ce45539f73efbc0cf9fc7, type: 3}
+  deathAudioClip: {fileID: 8300000, guid: 0763d2c9508914685b5c616d810613ee, type: 3}

@@ -81,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 564640783
-  m_SortingLayer: 6
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -765150924802650856, guid: 8db89128f53cb4de98d20b469a202cc8, type: 3}
@@ -180,3 +180,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Arrow
   speed: 20
+  arrowAudioClip: {fileID: 8300000, guid: 926e3c4e9e38643ff9ea221e95266ea3, type: 3}

@@ -30,6 +30,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Vector2 deathKick = new Vector2(10f, 10f);
     [SerializeField] Image deathOverlay;
 
+    GeneralSoundController soundController;
+
+    public AudioClip playerDeath;
+
     float startingGravityScale = 1f;
 
     bool isAlive = true;
@@ -60,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
     {
         playerRigidBody2D = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<CapsuleCollider2D>();
+        soundController = FindAnyObjectByType<GeneralSoundController>();
 
         startingGravityScale = playerRigidBody2D.gravityScale;
     }
@@ -79,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
             FlipSprite();
         }
 
-        Die();
+        CheckDeath();
         UpdateAnimation();
     }
 
@@ -195,19 +200,29 @@ public class PlayerMovement : MonoBehaviour
         playerAnimator.SetBool("isSwimming", isInWater);
     }
 
-    private void Die()
+    void CheckDeath()
     {
         if ((isTouchingEnemies || isTouchingHazards) && isAlive)
         {
             isAlive = false;
+            StartCoroutine(Die());
+        }
+    }
+
+    private IEnumerator Die()
+    {
+        if (isTouchingEnemies || isTouchingHazards)
+        {
             playerAnimator.SetTrigger("Dying");
+            soundController.PlaySound(playerDeath);
+
+            yield return new WaitForSecondsRealtime(0.5f);
 
             var gameSession = FindAnyObjectByType<GameSession>();
-            if (gameSession.HasMoreLives)
-            {
-                FindAnyObjectByType<GameSession>().ProcessPlayerDeath();
-            }
-            else
+            var hasMoreLifeToGo = gameSession.HasMoreLives;
+            gameSession.ProcessPlayerDeath();
+
+            if (!hasMoreLifeToGo)
             {
                 StartCoroutine(DeathFlash());
 
@@ -216,9 +231,11 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(DeathZoom());
 
                 playerRigidBody2D.linearVelocity = deathKick;
-                Invoke("DisablePlayer", 0.75f);
+                DisablePlayer();
             }
         }
+
+        yield return null;
     }
 
     IEnumerator DeathFreeze()

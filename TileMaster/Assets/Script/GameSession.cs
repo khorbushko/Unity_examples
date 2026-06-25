@@ -1,11 +1,19 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameSession : MonoBehaviour
+public class GameSession: MonoBehaviour
 {
     [SerializeField] int playerLives = 2;
+    GeneralSoundController soundController;
 
-    public bool HasMoreLives => playerLives > 1;
+    private int coinsCollected = 0;
+
+    public bool HasMoreLives => playerLives > 0;
+
+    public int GetCoinsCollectedCount => coinsCollected;
+
+    public AudioClip levelBackgroundAudioClip;
+    public AudioClip gameOverAudioClip;
 
     private void Awake()
     {
@@ -18,16 +26,18 @@ public class GameSession : MonoBehaviour
         {
             DontDestroyOnLoad(gameObject);
         }
+
     }
 
-    void Update()
+    void Start()
     {
-
+        soundController = FindAnyObjectByType<GeneralSoundController>();
+        soundController.PlaySoundLoop(levelBackgroundAudioClip);
     }
 
     public void ProcessPlayerDeath()
     {
-        if (playerLives > 1)
+        if (HasMoreLives)
         {
             TakeLife();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -45,7 +55,15 @@ public class GameSession : MonoBehaviour
 
     void ResetGameSession()
     {
-        SceneManager.LoadScene(0);
+        soundController.StopLoopSound();
+        soundController.PlaySound(gameOverAudioClip);
+
+        // SceneManager.LoadScene(0);
         Destroy(gameObject);
+    }
+
+    public void CollectCoin()
+    {
+        coinsCollected += 1;
     }
 }

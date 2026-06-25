@@ -138,7 +138,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 564640783
-  m_SortingLayer: 6
+  m_SortingLayer: 7
   m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1857188551261513057, guid: 2eb147d1ec11f454baa87e2c450ce822, type: 3}
@@ -271,6 +271,7 @@ MonoBehaviour:
   feetCollider: {fileID: 1751456985251212127}
   deathKick: {x: 10, y: 20}
   deathOverlay: {fileID: 0}
+  playerDeath: {fileID: 8300000, guid: 0763d2c9508914685b5c616d810613ee, type: 3}
 --- !u!61 &1751456985251212127
 BoxCollider2D:
   m_ObjectHideFlags: 0
