@@ -2,20 +2,21 @@ using UnityEngine;
 
 public class GeneralSoundController : MonoBehaviour
 {
+    public static GeneralSoundController Instance;
+
     public AudioSource audioSourceOnce;
     public AudioSource audioSourceLoop;
 
     private void Awake()
     {
-        int instancesNumbers = FindObjectsByType<GeneralSoundController>().Length;
-        if (instancesNumbers > 1)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
-        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()

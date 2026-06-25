@@ -8,7 +8,7 @@ public class Biuncer : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            FindAnyObjectByType<GeneralSoundController>().PlaySound(bounceEffect);
+            GeneralSoundController.Instance.PlaySound(bounceEffect);
         }
     }
 }

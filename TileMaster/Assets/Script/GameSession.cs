@@ -1,10 +1,14 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameSession: MonoBehaviour
+public class GameSession : MonoBehaviour
 {
+    public static GameSession Instance;
+
     [SerializeField] int playerLives = 2;
-    GeneralSoundController soundController;
+    [SerializeField] TextMeshProUGUI scoresText;
+    [SerializeField] TextMeshProUGUI livesText;
 
     private int coinsCollected = 0;
 
@@ -12,27 +16,29 @@ public class GameSession: MonoBehaviour
 
     public int GetCoinsCollectedCount => coinsCollected;
 
-    public AudioClip levelBackgroundAudioClip;
-    public AudioClip gameOverAudioClip;
+    public Vector3 CurrentCheckpoint { get; set; }
 
     private void Awake()
     {
-        int numberOfGameSessions = FindObjectsByType<GameSession>().Length;
-        if (numberOfGameSessions > 1)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-        }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
+            return;
         }
 
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
-        soundController = FindAnyObjectByType<GeneralSoundController>();
-        soundController.PlaySoundLoop(levelBackgroundAudioClip);
+        UpdateCanvas();
+    }
+
+    private void UpdateCanvas()
+    {
+        livesText.text = playerLives.ToString();
+        scoresText.text = (coinsCollected * 100).ToString();
     }
 
     public void ProcessPlayerDeath()
@@ -40,7 +46,6 @@ public class GameSession: MonoBehaviour
         if (HasMoreLives)
         {
             TakeLife();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         else
         {
@@ -51,19 +56,28 @@ public class GameSession: MonoBehaviour
     void TakeLife()
     {
         playerLives -= 1;
+        UpdateCanvas();
     }
 
     void ResetGameSession()
     {
-        soundController.StopLoopSound();
-        soundController.PlaySound(gameOverAudioClip);
-
-        // SceneManager.LoadScene(0);
         Destroy(gameObject);
+    }
+
+    public void RestartGame()
+    {
+        UpdateCanvas();
+        SceneManager.LoadScene(0);
     }
 
     public void CollectCoin()
     {
         coinsCollected += 1;
+        UpdateCanvas();
+    }
+
+    public void UpdateCheckPoint(Vector3 checkpoint)
+    {
+        CurrentCheckpoint = checkpoint;
     }
 }

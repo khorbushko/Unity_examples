@@ -20,7 +20,7 @@ public class Arrow : MonoBehaviour
                1f
            ); // rotate arrow
            
-        FindAnyObjectByType<GeneralSoundController>().PlaySound(arrowAudioClip);
+        GeneralSoundController.Instance.PlaySound(arrowAudioClip);
     }
 
     void Update()

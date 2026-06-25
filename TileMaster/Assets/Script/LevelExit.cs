@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class LevelExit : MonoBehaviour
 {
     [SerializeField] int currentLevel = 0;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
@@ -21,6 +22,7 @@ public class LevelExit : MonoBehaviour
         {
             nextIndex = 1;
         }
+
         SceneManager.LoadScene($"Level 0{nextIndex}");
     }
 }

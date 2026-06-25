@@ -17,7 +17,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] GameObject arrow;
     [SerializeField] Transform bow;
 
-
     [SerializeField] float runSpeed = 2f;
     [SerializeField] float jumpSpeed = 10f;
     [SerializeField] float climbingSpeed = 0.24f;
@@ -29,10 +28,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] BoxCollider2D feetCollider;
     [SerializeField] Vector2 deathKick = new Vector2(10f, 10f);
     [SerializeField] Image deathOverlay;
-
-    GeneralSoundController soundController;
+    Coroutine deathCoroutine;
 
     public AudioClip playerDeath;
+    public AudioClip gameOverAudioClip;
 
     float startingGravityScale = 1f;
 
@@ -64,9 +63,11 @@ public class PlayerMovement : MonoBehaviour
     {
         playerRigidBody2D = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<CapsuleCollider2D>();
-        soundController = FindAnyObjectByType<GeneralSoundController>();
 
         startingGravityScale = playerRigidBody2D.gravityScale;
+
+        FindAnyObjectByType<GameSession>()
+            .UpdateCheckPoint(playerRigidBody2D.transform.position);
     }
 
     void Update()
@@ -82,9 +83,9 @@ public class PlayerMovement : MonoBehaviour
             }
 
             FlipSprite();
+            CheckDeath();
         }
 
-        CheckDeath();
         UpdateAnimation();
     }
 
@@ -202,10 +203,15 @@ public class PlayerMovement : MonoBehaviour
 
     void CheckDeath()
     {
+        if (deathCoroutine != null)
+        {
+            return;
+        }
+
         if ((isTouchingEnemies || isTouchingHazards) && isAlive)
         {
             isAlive = false;
-            StartCoroutine(Die());
+            deathCoroutine = StartCoroutine(Die());
         }
     }
 
@@ -214,7 +220,7 @@ public class PlayerMovement : MonoBehaviour
         if (isTouchingEnemies || isTouchingHazards)
         {
             playerAnimator.SetTrigger("Dying");
-            soundController.PlaySound(playerDeath);
+            GeneralSoundController.Instance.PlaySound(playerDeath);
 
             yield return new WaitForSecondsRealtime(0.5f);
 
@@ -222,20 +228,49 @@ public class PlayerMovement : MonoBehaviour
             var hasMoreLifeToGo = gameSession.HasMoreLives;
             gameSession.ProcessPlayerDeath();
 
-            if (!hasMoreLifeToGo)
+            if (hasMoreLifeToGo)
             {
-                StartCoroutine(DeathFlash());
-
-                impulseSource.GenerateImpulse();
-                StartCoroutine(DeathFreeze());
-                StartCoroutine(DeathZoom());
-
-                playerRigidBody2D.linearVelocity = deathKick;
-                DisablePlayer();
+                Respawn();
+            }
+            else
+            {
+                EndGame();
             }
         }
 
+        deathCoroutine = null;
         yield return null;
+    }
+
+    private void Respawn()
+    {
+        DisablePlayer();
+
+        var gameSession = FindAnyObjectByType<GameSession>();
+        transform.position = gameSession.CurrentCheckpoint;
+
+        playerRigidBody2D.linearVelocity = Vector2.zero;
+        playerRigidBody2D.angularVelocity = 0f;
+        playerRigidBody2D.simulated = true;
+        isAlive = true;
+
+        playerAnimator.ResetTrigger("Dying");
+        playerAnimator.SetTrigger("Respawn");
+    }
+
+    private void EndGame()
+    {
+        GeneralSoundController.Instance.StopLoopSound();
+        GeneralSoundController.Instance.PlaySound(gameOverAudioClip);
+
+        StartCoroutine(DeathFlash());
+
+        impulseSource.GenerateImpulse();
+        StartCoroutine(DeathFreeze());
+        StartCoroutine(DeathZoom());
+
+        playerRigidBody2D.linearVelocity = deathKick;
+        DisablePlayer();
     }
 
     IEnumerator DeathFreeze()
